@@ -29,4 +29,8 @@ object CityApi {
     val service: CityApiService by lazy {
         retrofit.create(CityApiService::class.java)
     }
+
+    fun getCityUrl(imageId: String): String {
+        return "$BASE_URL$imageId.jpg"
+    }
 }

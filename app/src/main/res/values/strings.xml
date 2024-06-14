@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">City</string>
     <string name="logo">Logo</string>
+
+    <string name="gambar">Gambar %1$s</string>
 </resources>
