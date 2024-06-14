@@ -1,8 +1,14 @@
 package org.d3if3002.mini_project3.ui.screen
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,9 +24,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +64,10 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -78,6 +91,11 @@ fun MainScreen() {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
     var showDialog by remember { mutableStateOf(false) }
+
+    var bitmap: Bitmap? by remember { mutableStateOf(null) }
+    val launcher = rememberLauncherForActivityResult(CropImageContract()) {
+        bitmap = getCroppedImage(context.contentResolver, it)
+    }
 
     Scaffold(
         topBar = {
@@ -113,6 +131,23 @@ fun MainScreen() {
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                val options = CropImageContractOptions(
+                    null, CropImageOptions(
+                        imageSourceIncludeGallery = false,
+                        imageSourceIncludeCamera = true,
+                        fixAspectRatio = true
+                    )
+                )
+                launcher.launch(options)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.tambah_city)
+                )
+            }
         }
     ) {padding ->
         ScreenContent(Modifier.padding(padding))
@@ -149,7 +184,8 @@ fun ScreenContent(modifier: Modifier) {
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
-        columns = GridCells.Fixed(2)
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(bottom = 80.dp)
     ) {
         items(data) { ListItem(city = it)}
             }
@@ -260,6 +296,27 @@ private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserD
         Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
     }
 }
+
+
+private fun getCroppedImage(
+    resolver: ContentResolver,
+    result: CropImageView.CropResult
+): Bitmap? {
+    if (!result.isSuccessful) {
+        Log.e("IMAGE", "Error: ${result.error}")
+        return null
+    }
+
+    val uri = result.uriContent ?: return null
+
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        MediaStore.Images.Media.getBitmap(resolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(resolver, uri)
+        ImageDecoder.decodeBitmap(source)
+    }
+}
+
 
 private suspend fun signOut(context: Context, dataStore: UserDataStore) {
     try {
