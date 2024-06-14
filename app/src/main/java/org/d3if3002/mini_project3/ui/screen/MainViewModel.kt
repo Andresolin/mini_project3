@@ -24,7 +24,7 @@ class MainViewModel : ViewModel() {
         retrievedata()
     }
 
-    private fun retrievedata() {
+    fun retrievedata() {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.LOADING
             try {
@@ -32,6 +32,7 @@ class MainViewModel : ViewModel() {
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MianViewModel", "Failure: ${e.message}")
+                status.value = ApiStatus.FAILED
             }
         }
     }
