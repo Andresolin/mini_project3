@@ -29,7 +29,9 @@ private val retrofit = Retrofit.Builder()
 
 interface CityApiService {
     @GET("api_andre.php")
-    suspend fun getCity(): List<City>
+    suspend fun getCity(
+        @Header("Authorization") userId: String
+    ): List<City>
 
     @Multipart
     @POST("api_andre.php")
