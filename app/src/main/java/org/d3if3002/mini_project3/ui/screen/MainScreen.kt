@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import org.d3if3002.mini_project3.R
 import org.d3if3002.mini_project3.model.City
+import org.d3if3002.mini_project3.network.ApiStatus
 import org.d3if3002.mini_project3.network.CityApi
 
 
@@ -76,7 +79,18 @@ fun ScreenContent(modifier: Modifier) {
 
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
+    val status by viewModel.status.collectAsState()
 
+    when(status) {
+        ApiStatus.LOADING -> {
+//            Box(
+//                modifier = modifier.fillMaxSize(),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                CircularProgressIndicator()
+//            }
+        }
+        ApiStatus.SUCCESS -> {
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
@@ -84,6 +98,8 @@ fun ScreenContent(modifier: Modifier) {
         columns = GridCells.Fixed(2)
     ) {
         items(data) { ListItem(city = it)}
+            }
+        }
     }
 }
 
