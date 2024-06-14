@@ -20,12 +20,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.d3if3002.mini_project3.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
+
+    val viewModel: MainViewModel = viewModel()
+
     Scaffold(
         topBar = {
             TopAppBar(
