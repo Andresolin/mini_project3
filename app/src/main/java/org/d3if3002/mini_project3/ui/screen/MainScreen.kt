@@ -98,12 +98,17 @@ fun ListItem(city: City) {
     ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(CityApi.getCityUrl(city.imageId))
+                .data(
+//                     if (city.city == "Jakarta"){
+//                     CityApi.getCityUrl("not-found")
+//                      } else
+                    CityApi.getCityUrl(city.imageId))
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(id = R.string.gambar, city.city),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
+            error = painterResource(id = R.drawable.baseline_broken_image_24),
             modifier = Modifier.fillMaxWidth().padding(4.dp)
         )
 
