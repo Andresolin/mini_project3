@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://raw.githubusercontent.com/Andresolin/Static-JSON/main/"
+private const val BASE_URL = "https://unspoken.my.id/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -21,7 +21,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface CityApiService {
-    @GET("static-api.json")
+    @GET("api_andre.php")
     suspend fun getCity(): List<City>
 }
 
@@ -31,7 +31,7 @@ object CityApi {
     }
 
     fun getCityUrl(imageId: String): String {
-        return "$BASE_URL$imageId.jpg"
+        return "${BASE_URL}image.php?id=$imageId"
     }
 }
 
