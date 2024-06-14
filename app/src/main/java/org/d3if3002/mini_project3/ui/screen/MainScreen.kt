@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -93,6 +94,9 @@ fun MainScreen() {
     var showDialog by remember { mutableStateOf(false) }
     var showCityDialog by remember { mutableStateOf(false) }
 
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
+
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
         bitmap = getCroppedImage(context.contentResolver, it)
@@ -152,14 +156,14 @@ fun MainScreen() {
             }
         }
     ) {padding ->
-        ScreenContent(Modifier.padding(padding))
+        ScreenContent(viewModel, Modifier.padding(padding))
         if (showDialog) {
             ProfilDialog(
                 user = user,
                 onDismissRequest = { showDialog = false }) {
                 CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
                 showDialog = false
-            }
+                }
         }
 
 
@@ -167,16 +171,21 @@ fun MainScreen() {
             CityDialog(
                 bitmap = bitmap,
                 onDismissRequest = { showCityDialog = false }) { city, country ->
-                Log.d("TAMBAH", "$city $country ditambahkan.")
+                viewModel.saveData(user.email, city, country, bitmap!!)
                 showCityDialog = false
             }
+        }
+
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
     }
 }
 
 
 @Composable
-fun ScreenContent(modifier: Modifier) {
+fun ScreenContent(viewModel: MainViewModel,modifier: Modifier) {
 
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
