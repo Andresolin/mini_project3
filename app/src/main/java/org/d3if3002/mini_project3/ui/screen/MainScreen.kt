@@ -103,6 +103,7 @@ fun ListItem(city: City) {
                 .build(),
             contentDescription = stringResource(id = R.string.gambar, city.city),
             contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = R.drawable.loading_img),
             modifier = Modifier.fillMaxWidth().padding(4.dp)
         )
 
