@@ -9,11 +9,13 @@ import org.d3if3002.mini_project3.model.City
 import org.d3if3002.mini_project3.model.OpStatus
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 private const val BASE_URL = "https://unspoken.my.id/"
 
@@ -40,6 +42,13 @@ interface CityApiService {
         @Part("city") city: RequestBody,
         @Part("country") country: RequestBody,
         @Part image: MultipartBody.Part
+    ): OpStatus
+
+
+    @DELETE("api_andre.php")
+    suspend fun deleteCity(
+        @Header("Authorization") userId: String,
+        @Query("id") id: String
     ): OpStatus
 
 }

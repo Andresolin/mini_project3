@@ -141,14 +141,18 @@ fun MainScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                val options = CropImageContractOptions(
-                    null, CropImageOptions(
-                        imageSourceIncludeGallery = false,
-                        imageSourceIncludeCamera = true,
-                        fixAspectRatio = true
+                if (user.email.isEmpty()) {
+                    Toast.makeText(context, "EROR: Anda belum login", Toast.LENGTH_LONG).show()
+                } else {
+                    val options = CropImageContractOptions(
+                        null, CropImageOptions(
+                            imageSourceIncludeGallery = false,
+                            imageSourceIncludeCamera = true,
+                            fixAspectRatio = true
+                        )
                     )
-                )
-                launcher.launch(options)
+                    launcher.launch(options)
+                }
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -213,7 +217,12 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
-        items(data) { ListItem(city = it)}
+        items(data) { city ->
+            ListItem(
+                city = city,
+                onDelete = { viewModel.deleteCity(userId, city.id) }
+            )
+        }
             }
         }
 
@@ -238,7 +247,10 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
 
 
 @Composable
-fun ListItem(city: City) {
+fun ListItem(city: City, onDelete:() -> Unit) {
+
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -279,7 +291,31 @@ fun ListItem(city: City) {
             )
         }
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = { showDeleteDialog = true }) {
+                Icon(
+                    tint = Color.White,
+                    painter = painterResource(R.drawable.baseline_delete_24),
+                    contentDescription = stringResource(R.string.profil)
+                )
+            }
+        }
+
     }
+
+    DisplayAlertDialog(
+        openDialog = showDeleteDialog,
+        onDismissRequest = { showDeleteDialog = false },
+        onConfrimation = {
+            onDelete()
+            showDeleteDialog = false
+        }
+    )
 }
 
 
